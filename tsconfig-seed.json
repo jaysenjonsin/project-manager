@@ -1,35 +1,36 @@
-
+//seed script is not going to run in the same ts env that our project is in because project has diff config
+//this tsconfig is specifically for the seed script. only one thing is different, and that is the module is CommonJS instead of esnext
 {
   "compilerOptions": {
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "incremental": true,
     "esModuleInterop": true,
-    "module": "esnext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "paths": { //AKA aliases
+    "paths": {
       "@/components/*": ["./components/*"],
       "@/hooks/*": ["./hooks/*"],
       "@/lib/*": ["./lib/*"],
       "@/styles/*": ["./styles/*"],
       "@/prisma/*": ["./prisma/*"],
-      "@/assets/*": ["./assets/*"],
-      "@/*": ["./*"]
+      "@/assets/*": ["./assets/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }

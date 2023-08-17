@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+//good way to view db tables: npx prisma studio
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid()) //could also do Int with default (autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  email     String    @unique
+  password  String
+  firstName String?
+  lastName  String?
+  projects  Project[]
+  tasks     Task[]
+}
+
+model Project {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id]) //relations aren't actually part of the model. it just defines relationships to use for later db querying. so owner doesnt actually exist on project, but ownerId does. owner just defines the foreign key relationship
+  description String?
+  due         DateTime?
+  deleted     Boolean   @default(false) //common field for 'soft' deletes: dont actually remove from database, just flag it. also useful if person accidently deletes they can just get it back right after
+  tasks       Task[]
+  //ALTER TABLE project ADD CONSTRAINT constraint_name UNIQUE(ownerId,name);
+
+  @@unique([ownerId, name]) //adds unique constraint: ensures no duplicate combinations of ownerId and name are allowed - basically jsut saying the owner cant have two projects with the same name
+  @@index([ownerId, id])
+}
+
+//enum: data type with a fixed set of values - like multiple choice
+//CREATE TYPE TASK_STATUS as ENUM('NOT_STARTED','STARTED','COMPLETED');
+enum TASK_STATUS {
+  NOT_STARTED
+  STARTED
+  COMPLETED
+}
+
+model Task {
+  id          String      @id @default(uuid())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  status      TASK_STATUS @default(NOT_STARTED)
+  ownerId     String
+  owner       User        @relation(fields: [ownerId], references: [id])
+  projectId   String
+  project     Project     @relation(fields: [projectId], references: [id])
+  name        String
+  description String?
+  due         DateTime?
+  deleted     Boolean     @default(false)
+
+  @@index([ownerId]) //for the query that gets all the tasks from an owner -- always try to write an index if you make a query. if you make a query that isnt index go back and add the index
+}

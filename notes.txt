@@ -1,0 +1,62 @@
+
+(route layouts)
+parenthesis around auth and dashboard folders:
+These parenthesis create route grouping: it allows you to group routes together without having to add extra params to the route. so instead of having to do auth/register, the route is actually just /register. We are route grouping like this so that we can create two seperate layouts - remember default nextjs comes with one layout page, but our pages have different layouts so we are utilizing route grouping to allow for the creation of different layouts. 
+We essentially get benefit of grouping routes together without having to add to our URL.
+
+in next 13, any page has to be page.tsx in a folder. the folder represents the route to get to that page
+
+db.ts:
+//we will create wrapper around prisma client since we are in serverless environment
+
+//server environment is always on so there aren't problems with hitting connection limits. NextJS is serverless (AKA service environment instead of server environment), so whenever making an API call, we have to open a new connection and eventually you will hit a connection limit.
+
+// Because Next API functions run in a serveless environment, we're going to cache our Prisma client and reuse it when possible to avoid having too many connections.
+
+//essentilly what we are doing is we are caching our db connection to share across different serverless functions. the serverless functions are stateless and spin up and shut down, but the actual container that hosts them stay up for a while so we can utilize that connection
+
+//we are creating a prisma client instance, check if we already created one and if not save in global and return that one instead.
+
+//using any service db such as faunaDB or planetscale also can solve this problem.
+
+
+can create global css classes: just go into the styles folder and create global.css and then whatever uses it do import '@/styles/global.css';
+
+
+Layouts should have html tag, as well as head tag 
+
+'use client' at the top of file turns a component into a client component. use this for anything that needs the browser
+
+if you are ever going to change state based off previous state, you must pass a callback in setState to get access to the current state. if you dont pass the callback, you might be lagging behind the rendering in react. remember setting a state is async in react, if you pass the callback you are guarenteed to get the current state before you modify it
+
+router.replace vs router.push:
+push adds a new route to the stack. so user can press back.
+replace just replaces the current route. so the user cant press back. good for if the user signs in, so the user doesnt just go back to the signin page when they click back, since they are already signed in
+
+if a package will be used in a server component, you have to add it to the config under serverComponentsExternalPackages: ['packageName']
+
+some auth services you can use:
+clerk.dev, supertokens.com, NextAuth, check out nextjs docs, shows some auth instructions
+
+
+to make middleware in nextjs, just make middleware.ts file in root of proj
+
+nodejs uses edge runtime for middleware, which is a subsetof available Node.js API's. not all npm packages will work on this edge runtime!!
+
+
+Suspense component: lets you display a fallback until its children have finished loading. so no longer have to do if loading, show loading etc. 
+ex: 
+<Suspense fallback={<Loading />}>
+  <SomeComponent />
+</Suspense>
+
+this means you no longer have to use client component to see if its loaded on client, just use suspense component
+
+notice we can choose where we want to fetch our data: in a page or in a component (dashboard home page and Greetings component). the data fetching practice seems to be to make a func at the top called getData and then call that func inside the component/page. it also seems we make the component/page itself async
+
+you can create loading components for pages. witin the directory, just make app/(folder name)/loading.tsx (its in the same directory as the page.tsx file
+)
+
+//every page that is a dynamic page gets passed params prop --> see dashboard/project/[id]/page.tsx --> params is the id
+
+anything that needs to be updated immediately should happen client side. otherwise you have to refresh the router whenever you update or mutate
